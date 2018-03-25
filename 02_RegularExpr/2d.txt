@@ -1,0 +1,32 @@
+initial state: 7
+state 0 [reject]:
+  0 -> 9
+  1-9 -> 6
+state 1 [reject]:
+  p -> 5
+  m -> 5
+  1-9 -> 3
+state 2 [accept]:
+  d -> 0
+  e -> 1
+  0-9 -> 2
+state 3 [accept]:
+  0-9 -> 3
+state 4 [accept]:
+  d -> 0
+  e -> 1
+state 5 [reject]:
+  1-9 -> 3
+state 6 [accept]:
+  e -> 1
+  0-9 -> 6
+state 7 [reject]:
+  0 -> 4
+  m -> 8
+  d -> 0
+  e -> 1
+  1-9 -> 2
+state 8 [reject]:
+  1-9 -> 2
+state 9 [accept]:
+  e -> 1
