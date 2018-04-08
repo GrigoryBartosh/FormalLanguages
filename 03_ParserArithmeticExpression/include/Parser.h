@@ -14,7 +14,7 @@ public:
     : _pos(pos)
     { }
 
-    size_t get_pos()
+    size_t get_pos() const
     {
         return _pos;
     }
@@ -39,7 +39,7 @@ private:
 
     Tree* parse_number();
     Tree* parse_element();
-    Tree* parse_3(Tree* b);
+    Tree* parse_3();
     Tree* parse_2(Tree* b);
     Tree* parse_1();
     Tree* parse_block();

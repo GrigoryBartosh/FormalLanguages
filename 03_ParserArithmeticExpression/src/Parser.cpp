@@ -1,10 +1,12 @@
 #include "Parser.h"
 
 using std::ifstream;
+using std::cout;
+using std::endl;
 
 bool Parser::finished()
 {
-    return _position < (int)_str.size();
+    return !(_position < (int)_str.size());
 }
 
 char Parser::next_symbol()
@@ -15,7 +17,6 @@ char Parser::next_symbol()
 
 char Parser::get_next_symbol()
 {
-    while (!finished() && next_symbol() == ' ') _position++;
     char ans = next_symbol();
     _position++;
 
@@ -76,28 +77,19 @@ Tree* Parser::parse_element()
         return parse_number();
     }
     else
-        throw new ParserException(_position);
+        throw ParserException(_position);
 }
 
-Tree* Parser::parse_3(Tree* b)
+Tree* Parser::parse_3()
 {
-    Tree* a = NULL;
-    char op1 = 0;
-    while (is_operator(next_symbol()))
+    char op1 = get_next_symbol();
+    Tree* a = parse_element();
+    if (is_priority_3(next_symbol()))
     {
-        char op2 = next_symbol();
-
-        if (is_priority_3(op2))
-        {
-            a = makeOperator(a, op1, b);
-            op1 = get_next_symbol();
-            b = parse_element();
-        } else {
-            break;
-        }
+        return makeOperator(a, op1, parse_3());
+    } else {
+        return a;
     }
-
-    return makeOperator(a, op1, b);
 }
 
 Tree* Parser::parse_2(Tree* b)
@@ -114,7 +106,7 @@ Tree* Parser::parse_2(Tree* b)
             op1 = get_next_symbol();
             b = parse_element();
         } else {
-            if (is_priority_3(op2)) b = parse_3(b);
+            if (is_priority_3(op2)) b = makeOperator(b, op2, parse_3());
             else                    break;
         }
     }
@@ -138,7 +130,7 @@ Tree* Parser::parse_1()
             b = parse_element();
         } else {
             if (is_priority_2(op2)) b = parse_2(b);
-            else                    b = parse_3(b);
+            else                    b = makeOperator(b, op2, parse_3());
         }
     }
 
@@ -148,12 +140,12 @@ Tree* Parser::parse_1()
 Tree* Parser::parse_block()
 {
     if (get_next_symbol() != '(')
-        throw new ParserException(_position);
+        throw ParserException(_position);
 
     Tree* t = parse_1();
 
     if (get_next_symbol() != ')')
-        throw new ParserException(_position);
+        throw ParserException(_position);
 
     return t;
 }
