@@ -8,15 +8,21 @@ struct ParserException
 {
 private:
     size_t _pos;
+    std::string _str;
 
 public:
-    ParserException(size_t pos)
-    : _pos(pos)
+    ParserException(size_t pos, std::string str)
+    : _pos(pos), _str(str)
     { }
 
     size_t get_pos() const
     {
         return _pos;
+    }
+
+    std::string get_str() const
+    {
+        return _str;
     }
 };
 
@@ -25,6 +31,8 @@ class Parser
 private:
     std::string _str;
     int _position;
+
+    void do_throw();
 
     bool finished();
     char next_symbol();

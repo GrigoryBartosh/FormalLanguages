@@ -1,8 +1,21 @@
 #include "Parser.h"
 
+using std::string;
 using std::ifstream;
-using std::cout;
-using std::endl;
+
+void Parser::do_throw()
+{
+    string s;
+
+    _str[0] = '"';
+    _str[_str.size()-1] = '"';
+    s = _str + '\n';
+
+    for (int i = 0; i < _position; i++) s += ' ';
+    s += "^\n";
+
+    throw ParserException(_position-1, s);
+}
 
 bool Parser::finished()
 {
@@ -77,7 +90,10 @@ Tree* Parser::parse_element()
         return parse_number();
     }
     else
-        throw ParserException(_position);
+    {
+        do_throw();
+        return NULL;
+    }
 }
 
 Tree* Parser::parse_3()
@@ -139,19 +155,18 @@ Tree* Parser::parse_1()
 
 Tree* Parser::parse_block()
 {
-    if (get_next_symbol() != '(')
-        throw ParserException(_position);
+    if (get_next_symbol() != '(') do_throw();
 
     Tree* t = parse_1();
 
-    if (get_next_symbol() != ')')
-        throw ParserException(_position);
+    if (get_next_symbol() != ')') do_throw();
 
     return t;
 }
 
 Parser::Parser(ifstream &is)
 {
+    _str.clear();
     char c;
     while (is >> c) _str.push_back(c);
     _str = "(" + _str + ")";
@@ -160,5 +175,9 @@ Parser::Parser(ifstream &is)
 
 Tree* Parser::parse()
 {
-    return parse_block();
+    Tree* t = parse_block();
+
+    if (!finished()) do_throw();
+
+    return t;
 }
